@@ -1,17 +1,28 @@
 {{ template "partials/header" . }}
 <main class="drac-p-md">
-  <input
-    placeholder="Username"
-    type="text"
-    class="drac-input drac-input-white drac-text-white drac-mb-sm"
-  />
-  <input
-    placeholder="Password"
-    type="password"
-    class="drac-input drac-input-white drac-text-white drac-mb-sm"
-  />
-  <button class="drac-btn drac-bg-purple-cyan drac-mb-sm">Login</button>
-  <a href="/register" class="drac-btn drac-bg-purple drac-btn-outline drac-text-purple">
-    Register
-  </a>
+  <form hx-post="/login">
+    <input
+      id="username"
+      name="username"
+      placeholder="Username"
+      type="text"
+      class="drac-input drac-input-white drac-text-white drac-mb-sm"
+    />
+    <input
+      id="password"
+      name="password"
+      placeholder="Password"
+      type="password"
+      class="drac-input drac-input-white drac-text-white drac-mb-sm"
+    />
+    <button type="submit" class="drac-btn drac-bg-purple-cyan drac-mb-sm">
+      Login
+    </button>
+    <a
+      href="/register"
+      class="drac-btn drac-bg-purple drac-btn-outline drac-text-purple"
+    >
+      Register
+    </a>
+  </form>
 </main>
