@@ -1,0 +1,81 @@
+# https://taskfile.dev
+
+version: '3'
+
+dotenv:
+  - .env
+
+tasks:
+  default:
+    aliases:
+      - w
+      - watch
+    cmds:
+      - go mod tidy
+      - nodemon --ext '*' --signal SIGTERM --exec 'go' run main.go
+    silent: true
+
+  run:
+    cmds:
+      - go run main.go
+    silent: true
+
+  test:
+    cmds:
+      - go clean -testcache
+      - go test -v ./...
+    silent: true
+
+  create_db:
+    cmds:
+      - docker run --name postgres -e POSTGRES_USERNAME=$PGUSERNAME -e POSTGRES_PASSWORD=$PGPASSWORD -e POSTGRES_DB=$PGDATABASE -p $PGPORT:5432 -d postgres
+    silent: true
+
+  rm_db:
+    cmds:
+      - docker stop postgres
+      - docker rm postgres
+    silent: true
+
+  up:
+    cmds:
+      - migrate -path migrations -database $DATABASE_URL up
+    silent: true
+
+  down:
+      cmds:
+      - migrate -path migrations -database $DATABASE_URL down
+      silent: true
+
+  drop:
+    cmds:
+      - migrate -path migrations -database $DATABASE_URL drop
+    silent: true
+
+  migration:
+    cmds:
+      - migrate create -ext sql -dir migrations {{.name}}
+    silent: true
+
+  check:
+    aliases:
+      - c
+    cmds:
+      - echo "--- Checking dev dependencies ---"
+      - go version && echo "-------------------"
+      - echo "migrate version" && migrate -version && echo "-------------------"
+      - docker -v && echo "-------------------"
+      - echo "nodemon version" && nodemon -v && echo "-------------------"
+    silent: true
+
+  full:
+    aliases:
+      - f
+    cmds:
+      - task check
+      - task rm_db
+      - task create_db
+      # it takes a second for the db to start
+      - sleep 1 
+      - task watch
+    silent: true
