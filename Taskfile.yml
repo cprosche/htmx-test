@@ -77,5 +77,6 @@ tasks:
       - task create_db
       # it takes a second for the db to start
       - sleep 1 
+      - task up
       - task watch
     silent: true
