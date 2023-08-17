@@ -1,13 +1,10 @@
 package main
 
 import (
-	"encoding/base64"
 	"log"
 	"time"
 
-	"github.com/cprosche/htmx-test/store"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/template/html/v2"
 	"github.com/joho/godotenv"
 )
@@ -20,21 +17,34 @@ func main() {
 		Views: engine,
 	})
 
-	db, err := store.ConnectToDb()
-	if err != nil {
-		log.Fatal(err)
-	}
+	// db, err := store.ConnectToDb()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	users := map[string]string{}
 
-	app.Get("/", basicauth.New(basicauth.Config{
-		Users: users,
-		Unauthorized: func(c *fiber.Ctx) error {
-			return c.Redirect("/login")
-		},
-	}), func(c *fiber.Ctx) error {
+	app.Get("/", func(c *fiber.Ctx) error {
+		// set cookie
+		// c.Cookie(&fiber.Cookie{
+		// 	Name:     "username",
+		// 	Value:    "john",
+		// 	Expires:  time.Now().Add(time.Hour * 24),
+		// 	HTTPOnly: true,
+		// })
+
+		// get cookie
+		cookie := c.Cookies("username")
+		if cookie == "" {
+			return c.Render(
+				"htmx/login",
+				fiber.Map{},
+				"layouts/main",
+			)
+		}
+
 		return c.Render(
-			"index",
+			"htmx/homepage",
 			fiber.Map{},
 			"layouts/main",
 		)
@@ -66,28 +76,32 @@ func main() {
 	})
 
 	app.Post("login", func(c *fiber.Ctx) error {
-		username := c.FormValue("username")
-		password := c.FormValue("password")
-		if username == "" || password == "" {
-			return c.SendStatus(fiber.StatusBadRequest)
+		usernameCookie := c.Cookies("username")
+		usernameForm := c.FormValue("username")
+		passwordForm := c.FormValue("password")
+
+		if usernameCookie != "" {
+			// set header
+			return c.Render(
+				"htmx/homepage",
+				fiber.Map{},
+			)
 		}
 
-		user := store.User{
-			Username: username,
-			Password: password,
+		if usernameCookie == "" && usernameForm != "" && passwordForm != "" {
+			c.Cookie(&fiber.Cookie{
+				Name:     "username",
+				Value:    usernameForm,
+				Expires:  time.Now().Add(time.Hour * 24),
+				HTTPOnly: true,
+			})
+			return c.Render(
+				"htmx/homepage",
+				fiber.Map{},
+			)
 		}
 
-		err = user.Login(db)
-		if err != nil {
-			return c.SendStatus(fiber.StatusUnauthorized)
-		}
-
-		token := username + ":" + password
-		token = base64.StdEncoding.EncodeToString([]byte(token))
-
-		c.Response().Header.Add("HX-Redirect", "/")
-
-		return c.SendString("success")
+		return c.SendStatus(fiber.StatusBadRequest)
 	})
 
 	app.Post("register", func(c *fiber.Ctx) error {
@@ -116,6 +130,20 @@ func main() {
 		)
 	})
 
+	app.Post("/logout", func(c *fiber.Ctx) error {
+		c.Cookie(&fiber.Cookie{
+			Name:     "username",
+			Value:    "",
+			Expires:  time.Now().Add(-time.Hour),
+			HTTPOnly: true,
+		})
+
+		return c.Render(
+			"htmx/login",
+			fiber.Map{},
+		)
+	})
+
 	log.Fatal(app.Listen(":3000"))
 }
 
@@ -128,3 +156,5 @@ func main() {
 
 // 	return c.Next()
 // }
+
+// TODO: Add authentication middleware

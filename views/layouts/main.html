@@ -10,7 +10,8 @@
     <title>Paznic</title>
   </head>
   <body class="drac-bg-black drac-text drac-text-green drac-m-none">
-    {{ embed }}
+    {{ template "partials/header" . }}
+    <main id="main" class="drac-p-md">{{ embed }}</main>
     <script src="https://unpkg.com/htmx.org@1.9.4"></script>
   </body>
 </html>

@@ -1,0 +1,30 @@
+<form id="login-form">
+  <input
+    id="username"
+    name="username"
+    placeholder="Username"
+    type="text"
+    class="drac-input drac-input-white drac-text-white drac-mb-sm"
+  />
+  <input
+    id="password"
+    name="password"
+    placeholder="Password"
+    type="password"
+    class="drac-input drac-input-white drac-text-white drac-mb-sm"
+  />
+  <button
+    hx-post="/login"
+    hx-target="#login-form"
+    hx-swap="outerHTML"
+    class="drac-btn drac-bg-purple-cyan drac-mb-sm"
+  >
+    Login
+  </button>
+  <a
+    href="/register"
+    class="drac-btn drac-bg-purple drac-btn-outline drac-text-purple"
+  >
+    Register
+  </a>
+</form>
