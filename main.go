@@ -32,6 +32,7 @@ func main() {
 		// 	Expires:  time.Now().Add(time.Hour * 24),
 		// 	HTTPOnly: true,
 		// })
+		c.Set("HX-Redirect", "/success")
 
 		// get cookie
 		cookie := c.Cookies("username")
@@ -61,17 +62,15 @@ func main() {
 
 	app.Get("login", func(c *fiber.Ctx) error {
 		return c.Render(
-			"login",
+			"htmx/login",
 			fiber.Map{},
-			"layouts/main",
 		)
 	})
 
 	app.Get("register", func(c *fiber.Ctx) error {
 		return c.Render(
-			"register",
+			"htmx/register",
 			fiber.Map{},
-			"layouts/main",
 		)
 	})
 
@@ -112,17 +111,6 @@ func main() {
 		}
 
 		users[username] = password
-
-		// user := store.User{
-		// 	Username: username,
-		// 	Password: password,
-		// }
-
-		// err = user.Create(db)
-		// if err != nil {
-		// 	log.Println(err)
-		// 	return c.SendStatus(fiber.StatusUnauthorized)
-		// }
 
 		return c.Render(
 			"htmx/success",

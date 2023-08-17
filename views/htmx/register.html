@@ -1,4 +1,4 @@
-<form id="login-form" hx-post="/login">
+<form id="login-form" hx-post="/register">
   <input
     id="username"
     name="username"
@@ -13,15 +13,22 @@
     type="password"
     class="drac-input drac-input-white drac-text-white drac-mb-sm"
   />
-  <button type="submit" class="drac-btn drac-bg-purple-cyan drac-mb-sm">
-    Login
+  <input
+    id="confirm-password"
+    name="confirm-password"
+    placeholder="Confirm Password"
+    type="password"
+    class="drac-input drac-input-white drac-text-white drac-mb-sm"
+  />
+  <button class="drac-btn drac-bg-purple-cyan drac-mb-sm" type="submit">
+    Register
   </button>
   <button
-    hx-get="/register"
+    hx-get="/login"
     hx-target="#login-form"
     hx-swap="outerHTML"
     class="drac-btn drac-bg-purple drac-btn-outline drac-text-purple"
   >
-    Register
+    Login
   </button>
 </form>
