@@ -1,10 +1,11 @@
 <form id="login-form" hx-post="/login">
   <input
-    id="username"
-    name="username"
-    placeholder="Username"
-    type="text"
+    id="email"
+    name="email"
+    placeholder="Email"
+    type="email"
     class="drac-input drac-input-white drac-text-white drac-mb-sm"
+    required
   />
   <input
     id="password"
@@ -12,8 +13,13 @@
     placeholder="Password"
     type="password"
     class="drac-input drac-input-white drac-text-white drac-mb-sm"
+    required
   />
-  <button type="submit" class="drac-btn drac-bg-purple-cyan drac-mb-sm">
+  <button
+    type="submit"
+    class="drac-btn drac-bg-purple-cyan drac-mb-sm"
+    hx-indicator="#indicator"
+  >
     Login
   </button>
   <button
@@ -24,4 +30,5 @@
   >
     Register
   </button>
+  <div id="indicator" class="htmx-indicator">Logging in...</div>
 </form>

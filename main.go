@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/template/html/v2"
 	"github.com/joho/godotenv"
 )
@@ -17,6 +18,12 @@ func main() {
 		Views: engine,
 	})
 
+	app.Use(compress.New(
+		compress.Config{
+			Level: compress.LevelBestSpeed,
+		},
+	))
+
 	// db, err := store.ConnectToDb()
 	// if err != nil {
 	// 	log.Fatal(err)
@@ -25,42 +32,21 @@ func main() {
 	users := map[string]string{}
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		// set cookie
-		// c.Cookie(&fiber.Cookie{
-		// 	Name:     "username",
-		// 	Value:    "john",
-		// 	Expires:  time.Now().Add(time.Hour * 24),
-		// 	HTTPOnly: true,
-		// })
-		c.Set("HX-Redirect", "/success")
-
-		// get cookie
-		cookie := c.Cookies("username")
-		if cookie == "" {
-			return c.Render(
-				"htmx/login",
-				fiber.Map{},
-				"layouts/main",
-			)
-		}
-
 		return c.Render(
-			"htmx/homepage",
-			fiber.Map{},
 			"layouts/main",
-		)
-	})
-
-	app.Get("/test", func(c *fiber.Ctx) error {
-		return c.Render(
-			"htmx/div",
-			fiber.Map{
-				"Text": time.Now().Format("2006-01-02 15:04:05"),
-			},
+			fiber.Map{},
 		)
 	})
 
 	app.Get("login", func(c *fiber.Ctx) error {
+		emailCookie := c.Cookies("email")
+		if emailCookie != "" {
+			return c.Render(
+				"htmx/homepage",
+				fiber.Map{},
+			)
+		}
+
 		return c.Render(
 			"htmx/login",
 			fiber.Map{},
@@ -75,22 +61,22 @@ func main() {
 	})
 
 	app.Post("login", func(c *fiber.Ctx) error {
-		usernameCookie := c.Cookies("username")
-		usernameForm := c.FormValue("username")
+		time.Sleep(500 * time.Millisecond)
+		emailCookie := c.Cookies("email")
+		emailForm := c.FormValue("email")
 		passwordForm := c.FormValue("password")
 
-		if usernameCookie != "" {
-			// set header
+		if emailCookie != "" {
 			return c.Render(
 				"htmx/homepage",
 				fiber.Map{},
 			)
 		}
 
-		if usernameCookie == "" && usernameForm != "" && passwordForm != "" {
+		if emailCookie == "" && emailForm != "" && passwordForm != "" {
 			c.Cookie(&fiber.Cookie{
-				Name:     "username",
-				Value:    usernameForm,
+				Name:     "email",
+				Value:    emailForm,
 				Expires:  time.Now().Add(time.Hour * 24),
 				HTTPOnly: true,
 			})
@@ -104,13 +90,13 @@ func main() {
 	})
 
 	app.Post("register", func(c *fiber.Ctx) error {
-		username := c.FormValue("username")
+		email := c.FormValue("email")
 		password := c.FormValue("password")
-		if username == "" || password == "" {
+		if email == "" || password == "" {
 			return c.SendStatus(fiber.StatusBadRequest)
 		}
 
-		users[username] = password
+		users[email] = password
 
 		return c.Render(
 			"htmx/success",
@@ -120,7 +106,7 @@ func main() {
 
 	app.Post("/logout", func(c *fiber.Ctx) error {
 		c.Cookie(&fiber.Cookie{
-			Name:     "username",
+			Name:     "email",
 			Value:    "",
 			Expires:  time.Now().Add(-time.Hour),
 			HTTPOnly: true,

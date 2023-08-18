@@ -9,7 +9,7 @@ import (
 
 type User struct {
 	ID        uuid.UUID `db:"id" json:"id" form:"id"`
-	Username  string    `db:"username" json:"username" form:"username"`
+	Email     string    `db:"email" json:"email" form:"email"`
 	Password  string    `db:"password" json:"password" form:"password"`
 	CreatedAt time.Time `db:"created_at" json:"created_at" form:"created_at`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at" form:"updated_at`
@@ -22,12 +22,12 @@ func (u *User) Create(db *sqlx.DB) error {
 
 	_, err := db.Exec(`
 	INSERT INTO 
-		users (id, username, password, created_at, updated_at) 
+		users (id, email, password, created_at, updated_at) 
 	VALUES 
 		($1, $2, $3, $4, $5)
 	`,
 		id,
-		u.Username,
+		u.Email,
 		u.Password,
 		time,
 		time,
@@ -45,9 +45,9 @@ func (u *User) Create(db *sqlx.DB) error {
 
 func (u *User) Login(db *sqlx.DB) error {
 	err := db.Get(u, `
-	SELECT * FROM users WHERE username = $1 AND password = $2
+	SELECT * FROM users WHERE email = $1 AND password = $2
 	`,
-		u.Username,
+		u.Email,
 		u.Password,
 	)
 	if err != nil {

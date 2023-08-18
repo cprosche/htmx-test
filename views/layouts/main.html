@@ -3,15 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
     <link
       rel="stylesheet"
       href="https://unpkg.com/dracula-ui@1.0.3/styles/dracula-ui.css"
     />
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/htmx.org@1.9.4"
+    ></script>
     <title>Paznic</title>
   </head>
   <body class="drac-bg-black drac-text drac-text-green drac-m-none">
     {{ template "partials/header" . }}
-    <main id="main" class="drac-p-md">{{ embed }}</main>
-    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+    <main class="drac-p-md" hx-get="/login" hx-trigger="load"></main>
   </body>
 </html>
